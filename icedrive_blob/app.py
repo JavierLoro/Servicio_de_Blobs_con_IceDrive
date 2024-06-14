@@ -1,7 +1,5 @@
 """Authentication service application."""
 
-import logging
-import sys
 from typing import List
 import threading  # Module for working with threads
 import sys  # Module for system-specific parameters and functions

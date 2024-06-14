@@ -1,8 +1,8 @@
 """Servant implementation for the delayed response mechanism."""
 
 import Ice
-
 import IceDrive
+from .blob import BlobService
 
 
 class BlobQueryResponse(IceDrive.BlobQueryResponse):
