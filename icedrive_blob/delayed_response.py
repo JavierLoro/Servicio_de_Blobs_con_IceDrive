@@ -7,28 +7,53 @@ import IceDrive
 
 class BlobQueryResponse(IceDrive.BlobQueryResponse):
     """Query response receiver."""
-    def downloadBlob(self, blob: IceDrive.DataTransferPrx, current: Ice.Current = None) -> None:
+    def __init__(self, future: Ice.Future):
+        self.future = future
+        
+    def downloadBlobResponse(self, blob: IceDrive.DataTransferPrx, current: Ice.Current = None) -> None:
         """Receive a `DataTransfer` when other service instance knows the `blob_id`."""
+        self.future.set_result(blob)
 
     def blobExists(self, current: Ice.Current = None) -> None:
         """Indicate that `blob_id` was recognised by other service instance and it's stored there."""
+        self.future.set_result(None)
 
     def blobLinked(self, current: Ice.Current = None) -> None:
         """Indicate that `blob_id` was recognised by other service instance and was linked."""
+        self.future.set_result(None)
 
     def blobUnlinked(self, current: Ice.Current = None) -> None:
         """Indicate that `blob_id` was recognised by other service instance and was unlinked."""
+        self.future.set_result(None)
 
 class BlobQuery(IceDrive.BlobQuery):
     """Query receiver."""
+    def __init__(self, blob_servant: BlobService) -> None:
+        self.blob_servant = blob_servant                    
+    
     def downloadBlob(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query for downloading an archive based on `blob_id`."""
+        print(f"Descarga de blob: {blob_id}")
+        if self.doesBlobExist(blob_id):
+            response.downloadBlobResponse(self.blob_servant.download(None, blob_id)) #Usuario?
+            
 
     def doesBlobExist(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query to check if a given `blob_id` is stored in the instance."""
+        print(f"comprobacion Blob: {blob_id} existe")
+        if blob_id in self.blob_servant:
+            response.blobExists()
 
     def linkBlob(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query to create a link for `blob_id` archive if it exists."""
+        print(f"Link blob: {blob_id}")
+        if blob_id in self.blob_servant:
+            self.blob_servant.link(blob_id)
+            response.blobLinked()
 
     def unlinkBlob(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query to destroy a link for `blob_id` archive if it exists."""
+        print(f"Unlink blob: {blob_id}")
+        if blob_id in self.blob_servant:
+            self.blob_servant.unlink(blob_id)
+            response.blobUnlinked()
