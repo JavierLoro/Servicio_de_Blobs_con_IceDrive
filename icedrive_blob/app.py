@@ -67,7 +67,7 @@ class BlobApp(Ice.Application):
         
         shutdown = threading.Event()  # Create a threading event for shutdown
         publisher = IceDrive.DiscoveryPrx.uncheckedCast(discovery_topic.getPublisher())  # Get the Discovery publisher
-        blob_prx = IceDrive.BlobServicePrx.uncheckedCast(servant_proxy)  # Get the BlobService proxy
+        blob_prx = IceDrive.BlobServicePrx.uncheckedCast(servant_prx)  # Get the BlobService proxy
         threading.Thread(target=BlobApp.announce, args=(shutdown, publisher, blob_prx)).start()  # Start the announce thread
 
         

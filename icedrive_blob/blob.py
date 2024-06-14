@@ -5,6 +5,7 @@ import IceDrive
 import hashlib
 import sys
 import json
+from typing import Callable, Any
 
 from .discovery import Discovery
 
@@ -14,7 +15,7 @@ SIZE=1024
 class DataTransfer(IceDrive.DataTransfer):
     """Implementation of an IceDrive.DataTransfer interface."""
     def __init__(self, ruta_archivo: str):
-        self.file = open(ruta_Archivo,"rb")
+        self.file = open(ruta_archivo,"rb")
 
     def read(self, size: int, current: Ice.Current = None) -> bytes:
         """Returns a list of bytes from the opened file."""
@@ -57,7 +58,6 @@ class BlobService(IceDrive.BlobService):
         response = BlobQueryResponse(future)  # Crea una respuesta diferida.
         response_prx = adapter.addWithUUID(response)  # Añade la respuesta al adaptador con un UUID.
         response_prx = IceDrive.BlobQueryResponsePrx.uncheckedCast(response_prx)  # Castea el proxy de la respuesta.
-        logging.info("BlobService: querying other instances for blob: %s, waiting response on: %s", blob_id, response_prx)  # Registro de información.
         auxFunc(blob_id, response_prx)  # Llama a la función de ayuda.
 
         try:
@@ -88,7 +88,7 @@ class BlobService(IceDrive.BlobService):
         
         # Save the updated data back to the file
         
-    def createLinkBlob(blob_id: str):
+    def createLinkBlob(self, blob_id: str):
         with open(self.blob_links_path, 'r') as file:
             data = json.load(file)
 
@@ -132,7 +132,7 @@ class BlobService(IceDrive.BlobService):
         
         temp_filename = "temp_file.bin"
         sha256_hash = hashlib.sha256()
-        path = os.path.join(self.path, tmp_filename)
+        path = os.path.join(self.path, temp_filename)
         
         try:
             with open(path, "wb") as f:
@@ -176,7 +176,6 @@ class BlobService(IceDrive.BlobService):
         servant = DataTransfer(os.path.join(self.path, blob_id))
         prx = current.adapter.addWithUUID(servant) if current else None
 
-        logging.info("BlobService: created DataTransfer for blob %s at %s", blob_id, prx)
 
         return IceDrive.DataTransferPrx.uncheckedCast(prx) if current else servant
 
