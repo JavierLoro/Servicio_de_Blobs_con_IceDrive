@@ -35,13 +35,13 @@ class BlobApp(Ice.Application):
         )
         
         try:
-            eventos = manejadorEventos.retrieve(property("DiscoveryTopic"))     # Try to retrieve the topic by name
+            discovery_topic = manejadorEventos.retrieve(property("DiscoveryTopic"))     # Try to retrieve the topic by name
         except IceStorm.NoSuchTopic:                                            # If the topic does not exist, handle the exception
-            eventos = manejadorEventos.create(property("DiscoveryTopic"))       # Create the topic if it does not exist
+            discovery_topic = manejadorEventos.create(property("DiscoveryTopic"))       # Create the topic if it does not exist
         try:
-            eventos = manejadorEventos.retrieve(property("BlobQueryTopic"))     # Try to retrieve the topic by name
+            blob_query_topic = manejadorEventos.retrieve(property("BlobQueryTopic"))     # Try to retrieve the topic by name
         except IceStorm.NoSuchTopic:                                            # If the topic does not exist, handle the exception
-            eventos = manejadorEventos.create(property("BlobQueryTopic"))       # Create the topic if it does not exist
+            blob_query_topic = manejadorEventos.create(property("BlobQueryTopic"))       # Create the topic if it does not exist
         
         discovery_servant = Discovery()                                         # Create an instance of Discovery
         discovery_prx = adapter.addWithUUID(discovery_servant)                  # Add the Discovery servant to the adapter with a UUID
@@ -61,7 +61,7 @@ class BlobApp(Ice.Application):
         print("Proxy: %s", servant_prx)
         
         query_servant = BlobQuery(servant)
-        query_prx = adapter.addWithUUID(servant)
+        query_prx = adapter.addWithUUID(query_servant)
         blob_query_topic.subscribeAndGetPublisher({}, query_prx)
         
         
@@ -76,13 +76,6 @@ class BlobApp(Ice.Application):
         self.communicator().waitForShutdown()
 
         return 0
-    
-    
-    def getTopic(nombre: str, manejador: IceStorm.TopicManagerPrx) -> IceStorm.TopicPrx:
-        try:
-            evento = manejador.retrieve(nombre)
-        except:
-            evento = manejador.create(nombre)
 
 
 def main():
