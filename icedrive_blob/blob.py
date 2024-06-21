@@ -1,5 +1,6 @@
 """Module for servants implementations."""
 import os
+import logging
 import Ice
 import IceDrive
 import hashlib
