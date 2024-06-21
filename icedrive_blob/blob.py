@@ -130,7 +130,7 @@ class BlobService(IceDrive.BlobService):
         temp_filename = "temp_file.bin"
         sha256_hash = hashlib.sha256()
         path = os.path.join(self.path, temp_filename)
-        logging.debug(f"[BlobService] Subiendo archivo nuevo")
+        logging.debug("[BlobService] Subiendo archivo nuevo")
         try:
             with open(path, "wb") as f:
                 still_uploading = True
@@ -151,7 +151,7 @@ class BlobService(IceDrive.BlobService):
             BlobService.askOtherInstances(self.query_prx.doesBlobExist, blobId, current.adapter)
             os.remove(path)
         except IceDrive.UnknownBlob:
-            logging.debug(f"[BlobService] Archivo nuevo creado blob: {blob_id}")
+            logging.debug(f"[BlobService] Archivo nuevo creado blob: {blobId}")
             os.rename(path, os.path.join(self.path, blobId))
             self.createLinkBlob(blobId)
             self.link(blobId)
