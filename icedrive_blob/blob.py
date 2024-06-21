@@ -125,8 +125,8 @@ class BlobService(IceDrive.BlobService):
         self, user: IceDrive.UserPrx, blob: IceDrive.DataTransferPrx, current: Ice.Current = None
     ) -> str:
         """Register a DataTransfer object to upload a file to the service."""
-        #if not self.discovery_servant.getAtuhencticationService().verifyUser(user): #comprobacion usuario
-            #raise IceDrive.FailedToReadData
+        if not self.discovery_servant.getAtuhencticationService().verifyUser(user): #comprobacion usuario
+            raise IceDrive.FailedToReadData
         temp_filename = "temp_file.bin"
         sha256_hash = hashlib.sha256()
         path = os.path.join(self.path, temp_filename)
@@ -162,8 +162,8 @@ class BlobService(IceDrive.BlobService):
         self, user: IceDrive.UserPrx, blob_id: str, current: Ice.Current = None
     ) -> IceDrive.DataTransferPrx:
         """Return a DataTransfer objet to enable the client to download the given blob_id."""
-        #if user and not self.discovery_servant.getAtuhencticationService().verifyUser(user):
-            #raise IceDrive.FailedToReadData
+        if user and not self.discovery_servant.getAtuhencticationService().verifyUser(user):
+            raise IceDrive.FailedToReadData
         logging.debug(f"[BlobService] Intentando descargar blob: {blob_id}")
         path = os.path.join(self.path, blob_id)
         if not os.path.isfile(path):
