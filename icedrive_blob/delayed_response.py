@@ -1,8 +1,8 @@
 """Servant implementation for the delayed response mechanism."""
-
+import os
 import Ice
 import IceDrive
-from .blob import BlobService
+import logging
 
 
 class BlobQueryResponse(IceDrive.BlobQueryResponse):
@@ -27,33 +27,44 @@ class BlobQueryResponse(IceDrive.BlobQueryResponse):
         self.future.set_result(None)
 
 class BlobQuery(IceDrive.BlobQuery):
+    from .blob import BlobService
     """Query receiver."""
     def __init__(self, blob_servant: BlobService) -> None:
-        self.blob_servant = blob_servant                    
+        self.blob_servant = blob_servant
+        self.path = os.path.join(os.getcwd(), "SavesBlobs")            
     
     def downloadBlob(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query for downloading an archive based on `blob_id`."""
-        print(f"Descarga de blob: {blob_id}")
-        if self.doesBlobExist(blob_id):
-            response.downloadBlobResponse(self.blob_servant.download(None, blob_id)) #Usuario?
+        logging.debug(f"[Servicio blobQuery] Peticion download para el blob {blob_id}")
+        if os.path.isfile(os.path.join(self.path, blob_id)):
+            logging.debug(f"[Servicio blobQuery] Encontrado el blob {blob_id}")
+            response.downloadBlobResponse(self.blob_servant.download(None, blob_id))
             
-
+            """
+            servant = self.blob_servant.download(None, blob_id)
+            prx = current.adapter.addWithUUID(servant) if current else None
+            response.downloadBlobResponse(IceDrive.DataTransferPrx.uncheckedCast(prx))
+            """
+            
     def doesBlobExist(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query to check if a given `blob_id` is stored in the instance."""
-        print(f"comprobacion Blob: {blob_id} existe")
-        if blob_id in self.blob_servant:
+        logging.debug(f"[Servicio blobQuery] Peticion blodExist para el blob {blob_id}")
+        if os.path.isfile(os.path.join(self.path, blob_id)):
+            logging.debug(f"[Servicio blobQuery] Encontrado el blob {blob_id}")
             response.blobExists()
 
     def linkBlob(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query to create a link for `blob_id` archive if it exists."""
-        print(f"Link blob: {blob_id}")
-        if blob_id in self.blob_servant:
+        logging.debug(f"[Servicio blobQuery] Peticion link para el blob {blob_id}")
+        if os.path.isfile(os.path.join(self.path, blob_id)):
+            logging.debug(f"[Servicio blobQuery] Encontrado el blob {blob_id}")
             self.blob_servant.link(blob_id)
             response.blobLinked()
 
     def unlinkBlob(self, blob_id: str, response: IceDrive.BlobQueryResponsePrx, current: Ice.Current = None) -> None:
         """Receive a query to destroy a link for `blob_id` archive if it exists."""
-        print(f"Unlink blob: {blob_id}")
-        if blob_id in self.blob_servant:
+        logging.debug(f"[Servicio blobQuery] Peticion unlink para el blob {blob_id}")
+        if os.path.isfile(os.path.join(self.path, blob_id)):
+            logging.debug(f"[Servicio blobQuery] Encontrado el blob {blob_id}")
             self.blob_servant.unlink(blob_id)
             response.blobUnlinked()
