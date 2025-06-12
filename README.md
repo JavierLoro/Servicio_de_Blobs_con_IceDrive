@@ -1,13 +1,18 @@
-# IceDrive Authentication service template
+# IceDrive Blob Service
 
-This repository contains the project template for the Blob service proposed as laboratory work for the students
-of Distributed Systems in the course 2023-2024.
+Proyecto de la asignatura de Sistemas Distribuidos.
 
-## Updating `pyproject.toml`
+Servicio distribuido de almacenamiento de ficheros (blobs) usando ZeroC Ice e IceStorm.
 
-One of the first things that you need to setup when you clone this branch is to take a look into
-`pyproject.toml` file and update the needed values:
+## Requisitos
 
-- Project authors
-- Project dependencies
-- Projects URL humepage
+- Python 3.8 o superior
+- ZeroC Ice 3.7 o superior
+- IceStorm funcionando
+
+## Uso
+
+1. Ajusta los ficheros de configuración (`blob.config`, `icebox.config`, `icestorm.config`).
+2. Inicia el servicio:
+   ```bash
+   python app.py --Ice.Config=blob.config
